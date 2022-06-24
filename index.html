@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>장준우</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+</head>
+
+<body>
+    <style>
+        a{
+            font-family: 'Dancing Script', cursive;
+            font-size: xx-large;
+        }
+    </style>
+    <h1>나만의 포켓몬도감만들기</h1>
+    <p>인기 포켓몬을 구별해서 이에 대한 설명을 보여주는 미니 도감입니다. </p>
+    <button type="button" onclick="init()">Start</button>
+    <button type="button" onclick="predict()">Predict</button>
+    <script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <div class="file-upload">
+        <button class="file-upload-btn" type="button" onclick="$('.file-upload-input').trigger( 'click' )">Add
+            Image</button>
+
+        <div class="image-upload-wrap">
+            <input class="file-upload-input" type='file' onchange="readURL(this);" accept="image/*" />
+            <div class="drag-text">
+                <h3>Drag and drop a file or select add Image</h3>
+            </div>
+        </div>
+        <div class="file-upload-content">
+            <img class="file-upload-image" id="my-image" src="#" alt="your image" />
+            <div class="image-title-wrap">
+                <button type="button" onclick="removeUpload()" class="remove-image">Remove <span
+                        class="image-title">Uploaded Image</span></button>
+            </div>
+        </div>
+    </div>
+    <div id="webcam-container"></div>
+    <div id="label-container"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+    <script type="text/javascript">
+        // More API functions here:
+        // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image
+
+        // the link to your model provided by Teachable Machine export panel
+        const URL = "https://teachablemachine.withgoogle.com/models/32LH235Ak/";
+
+        let model, webcam, labelContainer, maxPredictions;
+
+        // Load the image model and setup the webcam
+        async function init() {
+            const modelURL = URL + "model.json";
+            const metadataURL = URL + "metadata.json";
+
+            // load the model and metadata
+            // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
+            // or files from your local hard drive
+            // Note: the pose library adds "tmImage" object to your window (window.tmImage)
+            model = await tmImage.load(modelURL, metadataURL);
+            maxPredictions = model.getTotalClasses();
+
+
+
+            // append elements to the DOM
+
+            labelContainer = document.getElementById("label-container");
+            for (let i = 0; i < maxPredictions; i++) { // and class labels
+                labelContainer.appendChild(document.createElement("div"));
+            }
+        }
+
+
+
+        // run the webcam image through the image model
+        async function predict() {
+            // predict can take in an image, video or canvas html element
+            var image = document.getElementById("my-image")
+            const prediction = await model.predict(image, false);
+            if (prediction[0].probability > 0.7) {
+                labelContainer.childNodes[0].innerHTML = "위 포켓몬은 피카츄입니다."
+                labelContainer.childNodes[1].innerHTML =
+                    "피카츄는 포켓몬스터에 등장하는 가상의 생명체이다. 애니메이션과 비디오게임에서는 오오타니 이쿠에가 그 목소리를 맡고 있다. 귀여운 전기 포켓몬을 그려달라는 스기모리 켄의 주문을 받아 니시다 아쓰코가 디자인하였다. 포켓몬 애니메이션에서 주인공 지우의 첫 포켓몬이자 파트너이다."
+            } else if (prediction[1].probability > 0.7) {
+                labelContainer.childNodes[0].innerHTML = "위 포켓몬은 파이리입니다."
+                labelContainer.childNodes[1].innerHTML =
+                    "《파이리》는 포켓몬스터 시리즈에 등장하는 가공의 캐릭터이다. 한국명인 '파이리'는 영어로 불을 뜻하는 'Fire'와 꼬리의 합성어이다."
+            } else if (prediction[2].probability > 0.7) {
+                labelContainer.childNodes[0].innerHTML = "위 포켓몬은 꼬부기입니다."
+                labelContainer.childNodes[1].innerHTML = "《꼬부기》는 포켓몬스터 시리즈에 등장하는 가공의 캐릭터이다. 분류는 꼬마거북 포켓몬이다."
+            } else if (prediction[3].probability > 0.7) {
+                labelContainer.childNodes[0].innerHTML = "위 포켓몬은 뮤입니다."
+                labelContainer.childNodes[1].innerHTML = "모든 배포 포켓몬의 태초, 시초이자 최초의 환상의 포켓몬이며, 공인되고 등장 이후 현재까지 남아 있는 유일한 버그 포켓몬."
+            } else if (prediction[4].probability > 0.7) {
+                labelContainer.childNodes[0].innerHTML = "위 포켓몬은 뮤츠입니다."
+                labelContainer.childNodes[1].innerHTML = "포켓몬스터 레드·그린, 블루, 피카츄를 대표하는 전설의 포켓몬이자 진 최종 보스."
+            } else if (prediction[5].probability > 0.7) {
+                labelContainer.childNodes[0].innerHTML = "위 포켓몬은 잠만보입니다."
+                labelContainer.childNodes[1].innerHTML = "모든 포켓몬스터 중에서 피카츄, 이브이와 함께 포켓몬스터를 잘 모르는 사람들도 많이 알고 있는 포켓몬이다. 잠만보는 그 특유의 덩치와 비만속성, 길막으로 유명하다. 일단 이름과 속성이 너무 명백하게 맞아떨어지는지라, 그리고 포켓몬스터 1세대 및 애니메이션이 대 히트를 치던 때엔 몸집이 커다랗고 살이 좀 찐 사람이나 잠이 많은 사람을 잠만보라고 불러대던 시절이 있었다."
+            } else if (prediction[6].probability > 0.7) {
+                labelContainer.childNodes[0].innerHTML = "위 포켓몬은 리자몽입니다."
+                labelContainer.childNodes[1].innerHTML = "1세대 출신 불꽃 타입 스타팅 포켓몬 파이리의 최종 진화형인 포켓몬. 그리고 피카츄, 이브이를 잇는 포켓몬스터의 또 다른 상징이라고도 할 수 있는 포켓몬이다. 일본에서의 원래 이름은 도마뱀을 뜻하는 리자드와 그리스어로 이빨을 뜻하는 오돈(ὀδών)에서[5] 따온 리자돈(リザードン)이며 한국판에서는 리자드+몬스터=리자몽이 되었다."
+
+            } else {
+                labelContainer.childNodes[0].innerHTML = "모르겠습니다."
+            }
+            // for (let i = 0; i < maxPredictions; i++) {
+            //     const classPrediction =
+            //         prediction[i].className + ": " + prediction[i].probability.toFixed(2);
+            //     labelContainer.childNodes[i].innerHTML = classPrediction;
+            // }
+        }
+    </script>
+    <script>
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('.image-upload-wrap').hide();
+
+                    $('.file-upload-image').attr('src', e.target.result);
+                    $('.file-upload-content').show();
+
+                    $('.image-title').html(input.files[0].name);
+                };
+
+                reader.readAsDataURL(input.files[0]);
+
+            } else {
+                removeUpload();
+            }
+        }
+
+        function removeUpload() {
+            $('.file-upload-input').replaceWith($('.file-upload-input').clone());
+            $('.file-upload-content').hide();
+            $('.image-upload-wrap').show();
+        }
+        $('.image-upload-wrap').bind('dragover', function () {
+            $('.image-upload-wrap').addClass('image-dropping');
+        });
+        $('.image-upload-wrap').bind('dragleave', function () {
+            $('.image-upload-wrap').removeClass('image-dropping');
+        });
+    </script>
+    <a>made by junwoo</a>
+</body>
+
+</html>
